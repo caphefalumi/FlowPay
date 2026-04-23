@@ -41,8 +41,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import com.fincore.fraud.avro.FraudCaseApprovedEvent;
-import com.fincore.fraud.avro.FraudCaseBlockedEvent;
+import com.matcodem.fincore.fraud.avro.FraudCaseApprovedEvent;
+import com.matcodem.fincore.fraud.avro.FraudCaseBlockedEvent;
 import com.matcodem.fincore.payment.domain.port.out.AccountServiceClient;
 import com.matcodem.fincore.payment.infrastructure.persistence.entity.OutboxMessageJpaEntity;
 import com.matcodem.fincore.payment.infrastructure.persistence.entity.PaymentJpaEntity;
