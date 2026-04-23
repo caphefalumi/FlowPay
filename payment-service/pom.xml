@@ -60,6 +60,15 @@
 		</dependency>
 
 		<!-- Avro + Schema Registry -->
+		<!-- fraud-detection-service publishes its Avro schemas as generated sources.
+		     This intra-project dependency makes com.matcodem.fincore.fraud.avro available
+		     to payment-service during the Maven reactor build (fraud before payment). -->
+		<dependency>
+			<groupId>com.matcodem</groupId>
+			<artifactId>fraud-detection-service</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>io.confluent</groupId>
 			<artifactId>kafka-avro-serializer</artifactId>
