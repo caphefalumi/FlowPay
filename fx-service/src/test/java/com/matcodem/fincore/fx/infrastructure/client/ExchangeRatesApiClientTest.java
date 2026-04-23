@@ -59,9 +59,8 @@ class ExchangeRatesApiClientTest {
 				.build();
 
 		// When mocked RestClient is called, return the response
-		RestClient.RequestHeadersSpec<?> spec = mock(RestClient.RequestHeadersSpec.class);
-		when(restClient.get()).thenReturn(spec);
-		// Additional mocking setup would be needed based on RestClient.Builder chain
+		RestClient.RequestHeadersUriSpec<?> uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+		when(restClient.get()).thenReturn(uriSpec);
 
 		// Then
 		// Assert that response is properly deserialized
@@ -129,13 +128,13 @@ class ExchangeRatesApiClientTest {
 				.tag("provider", "exchangeratesapi")
 				.tag("status", "success")
 				.counter())
-				.isPresent();
+				.isNotNull();
 
 		assertThat(meterRegistry.find("fx.rate.provider.requests")
 				.tag("provider", "exchangeratesapi")
 				.tag("status", "failure")
 				.counter())
-				.isPresent();
+				.isNotNull();
 	}
 
 	@Test

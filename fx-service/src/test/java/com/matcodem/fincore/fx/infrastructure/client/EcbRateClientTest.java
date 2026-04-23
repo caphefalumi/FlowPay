@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -119,13 +118,13 @@ class EcbRateClientTest {
 				.tag("provider", "ecb")
 				.tag("status", "success")
 				.counter())
-				.isPresent();
+				.isNotNull();
 
 		assertThat(meterRegistry.find("fx.rate.provider.requests")
 				.tag("provider", "ecb")
 				.tag("status", "failure")
 				.counter())
-				.isPresent();
+				.isNotNull();
 	}
 
 	@Test
