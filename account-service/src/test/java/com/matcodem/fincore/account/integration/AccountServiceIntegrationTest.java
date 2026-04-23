@@ -1,6 +1,7 @@
 package com.matcodem.fincore.account.integration;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import com.matcodem.fincore.account.domain.port.in.OpenAccountUseCase;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
+@Tag("integration")
 @DisplayName("Account Service Integration Tests")
 class AccountServiceIntegrationTest {
 
