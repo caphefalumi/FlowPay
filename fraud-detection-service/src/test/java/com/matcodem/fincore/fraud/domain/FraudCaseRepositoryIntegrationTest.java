@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,7 @@ import com.matcodem.fincore.fraud.domain.model.RuleResult;
 
 @SpringBootTest
 @Testcontainers
+@Tag("integration")
 @DisplayName("FraudCaseRepository Integration Tests")
 class FraudCaseRepositoryIntegrationTest {
 
