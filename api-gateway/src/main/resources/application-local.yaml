@@ -1,0 +1,74 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: account-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/accounts/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: account-service
+                fallbackUri: forward:/fallback/account-service
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+        - id: payment-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/payments/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: payment-service
+                fallbackUri: forward:/fallback/payment-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@userKeyResolver}"
+        - id: fx-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/fx/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: fx-service
+                fallbackUri: forward:/fallback/fx-service
+        - id: fraud-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/fraud/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: fraud-service
+                fallbackUri: forward:/fallback/fraud-service
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: fincore_redis_secret
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/fincore
+          jwk-set-uri: http://localhost:8180/realms/fincore/protocol/openid-connect/certs
+
+management:
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
