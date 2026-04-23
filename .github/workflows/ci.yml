@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: '25'
+  JAVA_VERSION: '21'
   # Reuse Maven local repo across jobs in the same run via cache
   MAVEN_OPTS: '-Xmx2048m -XX:+TieredCompilation -XX:TieredStopAtLevel=1'
 

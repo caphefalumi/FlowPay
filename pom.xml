@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.3</version>
+		<version>3.4.4</version>
 		<relativePath/>
 	</parent>
 
@@ -27,50 +27,18 @@
 	</modules>
 
 	<properties>
-		<java.version>25</java.version>
-		<maven.compiler.source>25</maven.compiler.source>
-		<maven.compiler.target>25</maven.compiler.target>
+		<java.version>21</java.version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!--
-		─── MIGRATION NOTES: Spring Boot 3.x -> 4.x ──────────────────────────
-		Boot 4 / Spring Framework 7 breaking changes relevant to FinCore:
-
-		1. JAKARTA EE 11
-		   No code changes needed - we already migrated javax -> jakarta in Boot 3.x.
-		   New baseline: Servlet 6.1, JPA 3.2, Bean Validation 3.1.
-
-		2. JACKSON 3
-		   Package relocated: com.fasterxml.jackson -> tools.jackson
-		   Default ObjectMapper replaced by JsonMapper (immutable).
-		   SORT_PROPERTIES_ALPHABETICALLY=true by default - may affect JSON test assertions.
-		   MapperFeature.DEFAULT_VIEW_INCLUSION=false by default.
-		   If a service uses Jackson 2 explicitly, add jackson-databind-2 compat dep.
-		   Boot 4 ships Jackson 3 but Jackson 2 can coexist as deprecated fallback.
-
-		3. TESTCONTAINERS 2.0
-		   Module artifact rename: org.testcontainers:postgresql -> org.testcontainers:testcontainers-postgresql
-		   Class package rename: org.testcontainers.containers.PostgreSQLContainer
-							   -> org.testcontainers.postgresql.PostgreSQLContainer
-		   Same pattern for kafka, junit-jupiter, redis.
-		   Boot 4 manages Testcontainers 2.x via its BOM - versions below are 2.x.
-
-		4. RESILIENCE4J
-		   resilience4j-spring-boot3 artifact renamed to resilience4j-spring-boot.
-		   Version 2.x is compatible with Boot 4. No API breaking changes.
-		   Built-in retry in Spring Framework 7 (@Retryable) is an alternative
-		   for simple use cases, but Resilience4j is retained for circuit breaker + bulkhead.
-
-		5. VIRTUAL THREADS (Java 21+, enhanced in Java 25)
-		   Enable with: spring.threads.virtual.enabled=true in application.yml
-		   Eliminates need for large Tomcat thread pools - set threads.max to a lower
-		   value (e.g. 50 -> 10 platform threads, virtual threads handle the rest).
-		   HikariCP: set maximumPoolSize conservatively - virtual threads don't help
-		   with DB connection limits; 10-20 is usually sufficient.
-
-		6. SPRING CLOUD (api-gateway)
-		   Spring Cloud 2025.0.x is required for Boot 4 compatibility.
-		   spring-cloud.version updated accordingly in api-gateway/pom.xml.
+		─── VIRTUAL THREADS (Java 21+) ───────────────────────────────────────
+		Enable with: spring.threads.virtual.enabled=true in application.yml
+		Eliminates need for large Tomcat thread pools - set threads.max to a lower
+		value (e.g. 50 -> 10 platform threads, virtual threads handle the rest).
+		HikariCP: set maximumPoolSize conservatively - virtual threads don't help
+		with DB connection limits; 10-20 is usually sufficient.
 		-->
 
 		<!-- Avro + Confluent Schema Registry -->
@@ -79,9 +47,9 @@
 
 		<!-- Testing -->
 		<!--
-		Testcontainers 2.0 ships with Spring Boot 4's BOM.
-		The version here is explicit to make it visible - Boot 4 manages it.
-		Artifact names changed: org.testcontainers:testcontainers-postgresql (note prefix).
+		Testcontainers 2.0 is managed by Spring Boot 3.4.4's BOM.
+		The version here is explicit to make it visible.
+		Artifact names: org.testcontainers:testcontainers-postgresql (note testcontainers- prefix).
 		-->
 		<testcontainers.version>2.0.3</testcontainers.version>
 		<wiremock.version>3.13.0</wiremock.version>
@@ -241,18 +209,15 @@
 					</configuration>
 				</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-						<parameters>true</parameters>
-						<compilerArgs>
-							<arg>--enable-preview</arg>
-						</compilerArgs>
-					</configuration>
-				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<parameters>true</parameters>
+				</configuration>
+			</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
