@@ -1,8 +1,6 @@
 package com.matcodem.fincore.fx.infrastructure.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -16,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
 import com.matcodem.fincore.fx.domain.model.Currency;
-import com.matcodem.fincore.fx.domain.model.CurrencyPair;
 import com.matcodem.fincore.fx.infrastructure.client.dto.ExchangeRatesApiResponse;
 import com.matcodem.fincore.fx.infrastructure.client.exception.RateProviderException;
 
@@ -50,7 +47,6 @@ class ExchangeRatesApiClientTest {
 	@DisplayName("should fetch rate successfully with type-safe DTO")
 	void testFetchRateSuccess() {
 		// Given
-		CurrencyPair pair = CurrencyPair.of(Currency.EUR, Currency.USD);
 		ExchangeRatesApiResponse response = ExchangeRatesApiResponse.builder()
 				.base("EUR")
 				.date("2026-03-10")
@@ -58,12 +54,7 @@ class ExchangeRatesApiClientTest {
 				.success(true)
 				.build();
 
-		// When mocked RestClient is called, return the response
-		RestClient.RequestHeadersUriSpec<?> uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
-		when(restClient.get()).thenReturn(uriSpec);
-
 		// Then
-		// Assert that response is properly deserialized
 		assertThat(response.getBase()).isEqualTo("EUR");
 		assertThat(response.getRates()).containsEntry("USD", BigDecimal.valueOf(1.09));
 		assertThat(response.isSuccessful()).isTrue();
