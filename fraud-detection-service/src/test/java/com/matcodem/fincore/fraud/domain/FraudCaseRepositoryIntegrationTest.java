@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -26,6 +27,7 @@ import com.matcodem.fincore.fraud.domain.model.RuleResult;
 
 @SpringBootTest
 @Testcontainers
+@ActiveProfiles("test")
 @Tag("integration")
 @DisplayName("FraudCaseRepository Integration Tests")
 class FraudCaseRepositoryIntegrationTest {
