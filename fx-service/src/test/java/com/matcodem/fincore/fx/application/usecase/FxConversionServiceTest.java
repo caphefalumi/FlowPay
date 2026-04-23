@@ -9,13 +9,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -73,10 +74,21 @@ class FxConversionServiceTest {
 		);
 
 		ExchangeRate rate = mock(ExchangeRate.class);
-		FxConversion conversion = mock(FxConversion.class);
 		FxConversion savedConversion = mock(FxConversion.class);
 
+		// Stub rate.convert() to return a valid ConversionResult - this is called by FxConversion.execute()
+		ExchangeRate.ConversionResult conversionResult = new ExchangeRate.ConversionResult(
+				command.pair(),
+				BigDecimal.valueOf(1000),
+				BigDecimal.valueOf(1100),
+				BigDecimal.valueOf(1.1),
+				BigDecimal.valueOf(0.5),
+				50,
+				Instant.now()
+		);
+		when(rate.convert(command.sourceAmount(), command.direction())).thenReturn(conversionResult);
 		when(rateQueryService.getRateWithFallback(command.pair())).thenReturn(rate);
+		when(conversionRepository.findByPaymentId(command.paymentId())).thenReturn(Optional.empty());
 		when(conversionRepository.save(any(FxConversion.class))).thenReturn(savedConversion);
 		when(savedConversion.pullDomainEvents()).thenReturn(List.of());
 
@@ -87,7 +99,7 @@ class FxConversionServiceTest {
 		assertThat(result).isEqualTo(savedConversion);
 		verify(rateQueryService).getRateWithFallback(command.pair());
 		verify(conversionRepository).save(any(FxConversion.class));
-		verify(eventPublisher).publishAll(List.of());
+		verify(outboxRepository).append(any(), any(String.class));
 		assertThat(meterRegistry.counter("fx.conversion.success", "pair", command.pair().getSymbol()).count())
 				.isEqualTo(1.0);
 	}
@@ -102,6 +114,7 @@ class FxConversionServiceTest {
 				BigDecimal.valueOf(1000), ExchangeRate.ConversionDirection.BUY_BASE
 		);
 
+		when(conversionRepository.findByPaymentId(command.paymentId())).thenReturn(Optional.empty());
 		when(rateQueryService.getRateWithFallback(command.pair()))
 				.thenThrow(new FxRateQueryService.RateUnavailableException("No rates available"));
 
@@ -114,9 +127,8 @@ class FxConversionServiceTest {
 				.isInstanceOf(FxRateQueryService.RateUnavailableException.class);
 
 		// Verify failure was recorded
-		ArgumentCaptor<FxConversion> conversionCaptor = ArgumentCaptor.forClass(FxConversion.class);
-		verify(conversionRepository).save(conversionCaptor.capture());
-		verify(eventPublisher).publishAll(List.of());
+		verify(conversionRepository).save(any(FxConversion.class));
+		verify(outboxRepository).append(any(), any(String.class));
 		assertThat(meterRegistry.counter("fx.conversion.failed", "pair", command.pair().getSymbol(),
 				"reason", "RateUnavailableException").count())
 				.isEqualTo(1.0);
@@ -187,11 +199,22 @@ class FxConversionServiceTest {
 		);
 
 		ExchangeRate rate = mock(ExchangeRate.class);
-		FxConversion conversion = mock(FxConversion.class);
+		FxConversion savedConversion = mock(FxConversion.class);
 
+		ExchangeRate.ConversionResult conversionResult = new ExchangeRate.ConversionResult(
+				command.pair(),
+				BigDecimal.valueOf(1000),
+				BigDecimal.valueOf(1100),
+				BigDecimal.valueOf(1.1),
+				BigDecimal.valueOf(0.5),
+				50,
+				Instant.now()
+		);
+		when(rate.convert(command.sourceAmount(), command.direction())).thenReturn(conversionResult);
 		when(rateQueryService.getRateWithFallback(command.pair())).thenReturn(rate);
-		when(conversionRepository.save(any(FxConversion.class))).thenReturn(conversion);
-		when(conversion.pullDomainEvents()).thenReturn(List.of());
+		when(conversionRepository.findByPaymentId(command.paymentId())).thenReturn(Optional.empty());
+		when(conversionRepository.save(any(FxConversion.class))).thenReturn(savedConversion);
+		when(savedConversion.pullDomainEvents()).thenReturn(List.of());
 
 		// When
 		service.convert(command);
