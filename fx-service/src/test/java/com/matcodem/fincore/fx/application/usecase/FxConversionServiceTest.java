@@ -90,7 +90,6 @@ class FxConversionServiceTest {
 		when(rateQueryService.getRateWithFallback(command.pair())).thenReturn(rate);
 		when(conversionRepository.findByPaymentId(command.paymentId())).thenReturn(Optional.empty());
 		when(conversionRepository.save(any(FxConversion.class))).thenReturn(savedConversion);
-		when(savedConversion.pullDomainEvents()).thenReturn(List.of());
 
 		// When
 		FxConversion result = service.convert(command);
@@ -120,7 +119,6 @@ class FxConversionServiceTest {
 
 		FxConversion failedConversion = mock(FxConversion.class);
 		when(conversionRepository.save(any(FxConversion.class))).thenReturn(failedConversion);
-		when(failedConversion.pullDomainEvents()).thenReturn(List.of());
 
 		// When/Then
 		assertThatThrownBy(() -> service.convert(command))
@@ -214,7 +212,6 @@ class FxConversionServiceTest {
 		when(rateQueryService.getRateWithFallback(command.pair())).thenReturn(rate);
 		when(conversionRepository.findByPaymentId(command.paymentId())).thenReturn(Optional.empty());
 		when(conversionRepository.save(any(FxConversion.class))).thenReturn(savedConversion);
-		when(savedConversion.pullDomainEvents()).thenReturn(List.of());
 
 		// When
 		service.convert(command);
